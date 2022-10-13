@@ -28,17 +28,17 @@ impl BinaryNode {
         self.prob
     }
 
-    pub fn get_hamming_code(&self) -> Vec<(char, String)> {
+    pub fn get_huffman_code(&self) -> Vec<(char, String)> {
         let mut ret: Vec<(char, String)> = vec![];
         let has_children = self.right.is_some() && self.left.is_some();
         if has_children {
-            let mut right_ret = self.right.as_ref().unwrap().get_hamming_code();
+            let mut right_ret = self.right.as_ref().unwrap().get_huffman_code();
             for r in right_ret.iter_mut() {
                 r.1 = format!("1{}", r.1);
             }
             ret.append(&mut right_ret);
 
-            let mut left_ret = self.left.as_ref().unwrap().get_hamming_code();
+            let mut left_ret = self.left.as_ref().unwrap().get_huffman_code();
             for l in left_ret.iter_mut() {
                 l.1 = format!("0{}", l.1);
             }

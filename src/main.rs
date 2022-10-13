@@ -56,5 +56,5 @@ fn main() {
     }
 
     println!("Alphabet {:?}", alphabet);
-    println!("Code {:?}", tree[0].get_hamming_code());
+    println!("Code {:?}", tree[0].get_huffman_code());
 }
