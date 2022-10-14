@@ -2,7 +2,7 @@
 name = "huffman"
 version = "0.1.0"
 edition = "2021"
-author = "Nathan Medros<nathan.medros@gmail.com>"
+authors = ["Nathan Medros <nathan.medros@gmail.com>"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
