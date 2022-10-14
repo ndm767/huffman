@@ -21,9 +21,6 @@ impl BinaryNode {
         }
     }
 
-    pub fn get_symbol(&self) -> Option<char> {
-        self.symbol
-    }
     pub fn get_prob(&self) -> f32 {
         self.prob
     }
