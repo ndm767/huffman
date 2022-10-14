@@ -3,7 +3,9 @@ extern crate csv;
 pub mod binary_tree;
 
 use binary_tree::BinaryNode;
+use std::cmp::Ordering;
 use std::env;
+use std::fs;
 
 fn vec_insert_val(v: &mut Vec<BinaryNode>, val: BinaryNode) {
     if v.len() == 0 {
@@ -21,17 +23,19 @@ fn vec_insert_val(v: &mut Vec<BinaryNode>, val: BinaryNode) {
 
 fn main() {
     let mut argv = env::args();
-    if argv.len() <= 1 {
+    if argv.len() <= 3 {
         println!("Not enough arguments!");
         return;
     }
 
-    //let encode = argv.nth(2).unwrap().contains("encode");
+    let csv_path = argv.nth(1).unwrap();
+    let encode = argv.nth(0).unwrap().contains("encode");
+    let in_file = fs::read_to_string(argv.nth(0).unwrap()).unwrap();
 
     let mut alphabet: Vec<(char, f32)> = vec![];
     let mut rdr = csv::ReaderBuilder::new()
         .has_headers(false)
-        .from_path(argv.nth(1).unwrap())
+        .from_path(csv_path)
         .unwrap();
     for res in rdr.records() {
         let rec = res.unwrap();
@@ -63,7 +67,75 @@ fn main() {
         );
     }
 
-    println!("Alphabet {:?}", alphabet);
-    println!("Code {:?}", tree[0].get_huffman_code());
-    // TODO encode + decode
+    println!("Alphabet: {:?}", alphabet);
+    let mut huffman_code = tree[0].get_huffman_code();
+    println!("Code: {:?}", huffman_code);
+
+    if encode {
+        // get create lookup table
+        let mut max_symb = 0u32;
+        for i in 0..huffman_code.len() {
+            if huffman_code[i].0 as u32 > max_symb {
+                max_symb = huffman_code[i].0 as u32;
+            }
+        }
+        let mut lookup: Vec<String> = Vec::new();
+        for _i in 0..(max_symb as usize + 2) {
+            lookup.push(String::from(""));
+        }
+        for i in 0..huffman_code.len() {
+            lookup[huffman_code[i].0 as usize] = huffman_code[i].1.clone();
+        }
+
+        println!("Original message:\n{}", in_file);
+        println!("Encoded message:");
+        for c in in_file.chars() {
+            print!("{}", lookup[c as usize]);
+        }
+        println!("");
+    } else {
+        huffman_code.sort_by(|a, b| {
+            if a.1.len() < b.1.len() {
+                return Ordering::Less;
+            } else if a.1.len() > b.1.len() {
+                return Ordering::Greater;
+            }
+            a.1.trim()
+                .parse::<u64>()
+                .unwrap()
+                .cmp(&b.1.trim().parse::<u64>().unwrap())
+        });
+        // create lookup table based upon string length
+        let mut matches: Vec<Vec<(String, char)>> = Vec::new();
+        for i in huffman_code.iter() {
+            while matches.len() <= i.1.len() {
+                matches.push(Vec::new())
+            }
+
+            matches[i.1.len()].push((i.1.clone(), i.0));
+        }
+
+        let mut start: usize = 0;
+        let mut curr: usize = 0;
+        let file_len = in_file.len();
+        println!("Original message:\n{}", in_file);
+        println!("Decoded message:");
+        while curr < file_len {
+            let test = String::from(&in_file[start..=curr]);
+            //println!("{}", test);
+            if test.len() > matches.len() {
+                panic!("No match found for {}!", test);
+            }
+
+            for t in matches[test.len()].iter() {
+                if t.0.cmp(&test) == Ordering::Equal {
+                    print!("{}", t.1);
+                    start = curr + 1;
+                    break;
+                }
+            }
+            curr += 1;
+        }
+        println!();
+    }
 }
