@@ -72,7 +72,7 @@ fn main() {
     println!("Code: {:?}", huffman_code);
 
     if encode {
-        // get create lookup table
+        // create lookup table
         let mut max_symb: usize = 0;
         for i in 0..huffman_code.len() {
             if huffman_code[i].0 as usize > max_symb {
