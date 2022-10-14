@@ -73,10 +73,10 @@ fn main() {
 
     if encode {
         // get create lookup table
-        let mut max_symb = 0u32;
+        let mut max_symb: usize = 0;
         for i in 0..huffman_code.len() {
-            if huffman_code[i].0 as u32 > max_symb {
-                max_symb = huffman_code[i].0 as u32;
+            if huffman_code[i].0 as usize > max_symb {
+                max_symb = huffman_code[i].0 as usize;
             }
         }
         let mut lookup: Vec<String> = Vec::new();
@@ -90,7 +90,12 @@ fn main() {
         println!("Original message:\n{}", in_file);
         println!("Encoded message:");
         for c in in_file.chars() {
-            print!("{}", lookup[c as usize]);
+            // hack for control characters
+            if !(c == '\n' || c == ' ') {
+                print!("{}", lookup[c as usize]);
+            } else {
+                print!("{}", c);
+            }
         }
         println!("");
     } else {
@@ -121,21 +126,33 @@ fn main() {
         println!("Original message:\n{}", in_file);
         println!("Decoded message:");
         while curr < file_len {
-            let test = String::from(&in_file[start..=curr]);
-            //println!("{}", test);
-            if test.len() > matches.len() {
-                panic!("No match found for {}!", test);
-            }
-
-            for t in matches[test.len()].iter() {
-                if t.0.cmp(&test) == Ordering::Equal {
-                    print!("{}", t.1);
-                    start = curr + 1;
-                    break;
+            if in_file[curr..=curr].cmp(" ") == Ordering::Equal {
+                print!(" ");
+                curr += 1;
+                start = curr;
+            } else if in_file[curr..=curr].cmp("\n") == Ordering::Equal {
+                print!("\n");
+                curr += 1;
+                start = curr;
+            } else {
+                let test = String::from(&in_file[start..=curr]);
+                if test.len() > matches.len() {
+                    panic!("No match found for {}!", test);
                 }
+
+                for t in matches[test.len()].iter() {
+                    if t.0.cmp(&test) == Ordering::Equal {
+                        print!("{}", t.1);
+                        start = curr + 1;
+                        break;
+                    }
+                }
+                curr += 1;
             }
-            curr += 1;
         }
         println!();
     }
+
+    println!("Alphabet: {:?}", alphabet);
+    println!("Code: {:?}", huffman_code);
 }
