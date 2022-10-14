@@ -5,12 +5,28 @@ pub mod binary_tree;
 use binary_tree::BinaryNode;
 use std::env;
 
+fn vec_insert_val(v: &mut Vec<BinaryNode>, val: BinaryNode) {
+    if v.len() == 0 {
+        v.push(val);
+        return;
+    }
+    for i in 0..v.len() {
+        if v[i].get_prob() > val.get_prob() {
+            v.insert(i, val);
+            return;
+        }
+    }
+    v.push(val);
+}
+
 fn main() {
     let mut argv = env::args();
     if argv.len() <= 1 {
-        println!("No CSV file provided!");
+        println!("Not enough arguments!");
         return;
     }
+
+    //let encode = argv.nth(2).unwrap().contains("encode");
 
     let mut alphabet: Vec<(char, f32)> = vec![];
     let mut rdr = csv::ReaderBuilder::new()
@@ -32,29 +48,22 @@ fn main() {
     }
 
     while tree.len() > 1 {
-        let mut i = 0usize;
-        let start_len = tree.len();
-        let mut new_tree: Vec<BinaryNode> = vec![];
-        while i < start_len {
-            println!("{} {} {}", i, start_len, tree.len());
-            if i < start_len - 1 {
-                let l = &tree[i];
-                let r = &tree[i + 1];
-                new_tree.push(BinaryNode::new(
-                    l.get_prob() + r.get_prob(),
-                    None,
-                    Some(Box::new(l.clone())),
-                    Some(Box::new(r.clone())),
-                ))
-            } else {
-                new_tree.push(tree[i].clone());
-            }
-            i += 2;
-        }
-
-        tree = new_tree.clone();
+        let n1 = tree[0].clone();
+        let n2 = tree[1].clone();
+        tree.remove(0);
+        tree.remove(0);
+        vec_insert_val(
+            &mut tree,
+            BinaryNode::new(
+                n1.get_prob() + n2.get_prob(),
+                None,
+                Some(Box::new(n1)),
+                Some(Box::new(n2)),
+            ),
+        );
     }
 
     println!("Alphabet {:?}", alphabet);
     println!("Code {:?}", tree[0].get_huffman_code());
+    // TODO encode + decode
 }

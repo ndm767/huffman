@@ -1,4 +1,4 @@
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct BinaryNode {
     symbol: Option<char>,
     prob: f32,
