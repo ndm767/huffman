@@ -1,17 +1,6 @@
 use std::cmp::Ordering;
 
-pub fn decode(huffman_code: &mut Vec<(char, String)>, input: String) {
-    huffman_code.sort_by(|a, b| {
-        if a.1.len() < b.1.len() {
-            return Ordering::Less;
-        } else if a.1.len() > b.1.len() {
-            return Ordering::Greater;
-        }
-        a.1.trim()
-            .parse::<u64>()
-            .unwrap()
-            .cmp(&b.1.trim().parse::<u64>().unwrap())
-    });
+pub fn decode(huffman_code: &Vec<(char, String)>, input: String) {
     // create lookup table based upon string length
     let mut matches: Vec<Vec<(String, char)>> = Vec::new();
     for i in huffman_code.iter() {
