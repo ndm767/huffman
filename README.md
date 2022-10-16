@@ -1,6 +1,6 @@
 # Huffman
 
-Huffman coding in Rust for my Information and Coding Theory Independent Study.
+Huffman coding in Rust for my Information and Coding Theory independent study.
 
 Example output: [bookprob_output.md](bookprob_output.md)
 
